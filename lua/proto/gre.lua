@@ -18,6 +18,7 @@ local initHeader = initHeader
 
 local ntoh, hton = ntoh, hton
 local ntoh16, hton16 = ntoh16, hton16
+local hton32 = hton32
 local bor, band, bnot, rshift, lshift = bit.bor, bit.band, bit.bnot, bit.rshift, bit.lshift
 local istype = ffi.istype
 local format = string.format
@@ -40,6 +41,7 @@ gre.PROTO_TEB = 0x6558
 gre.headerFormat = [[
 	uint16_t flags_and_version;
 	uint16_t protocol_type;
+	uint32_t key;
 ]]
 
 --- Variable sized member
@@ -84,11 +86,16 @@ end
 --- fill() --- only default values
 --- fill{greProto = 10} --- all members are set to default values
 --- @endcode
+function greHeader:setKey(int)
+	int = int or 0xFFFFFFFF
+	self.key = int
+end
 function greHeader:fill(args, pre)
 	args = args or {}
 	pre = pre or "gre"
 	self:setProtoType(args[pre .. "Proto"])
 	self:setFlagsAndVersion(args[pre .. "Flags"])
+	self:setKey(args[pre .. "Key"])
 end
 
 --- Retrieve the values of all members.
